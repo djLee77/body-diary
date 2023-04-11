@@ -1,12 +1,16 @@
 import './App.css';
-import Login from './components/Login'
-import SignUp from './components/SignUp'
+import Layout from "./components/Layout";
+import Login from "./components/Login"
+import { BrowserRouter, Routes, Route} from 'react-router-dom'
+
 function App() {
   return (
-    <div>  
-      <Login/>
-      <SignUp/>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path={"/"} element={<Layout/>}></Route>
+        <Route path={"/login"} element={<Login/>}></Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

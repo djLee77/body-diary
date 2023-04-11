@@ -4,6 +4,7 @@ import axios from "axios";
 function SignUp() {
   const [inputId, setInputId] = useState("");
   const [inputPw, setInputPw] = useState("");
+  const [inputName, setInputName] = useState("");
 
   // input data 의 변화가 있을 때마다 value 값을 변경해서 useState 해준다
   const handleInputId = (e) => {
@@ -14,12 +15,17 @@ function SignUp() {
     setInputPw(e.target.value);
   };
 
-  // login 버튼 클릭 이벤트
+  const handleInputName = (e) => {
+    setInputName(e.target.value);
+  };
+
+  // 회원가입 버튼 클릭 이벤트
   const onClickSignUp = () => {
     console.log("click SignUp");
     const data = {
-      username : inputId,
-      password : inputPw
+      userid : inputId,
+      password : inputPw,
+      name : inputName
     }
 
     axios.post("http://localhost:3001/register", data)
@@ -63,6 +69,15 @@ function SignUp() {
           name="input_pw"
           value={inputPw}
           onChange={handleInputPw}
+        />
+      </div>
+      <div>
+        <label htmlFor="input_name">NAME : </label>
+        <input
+          type="name"
+          name="input_name"
+          value={inputName}
+          onChange={handleInputName}
         />
       </div>
       <div>

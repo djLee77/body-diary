@@ -22,10 +22,10 @@ app.get("/mysql", (req, res) => {
 //로그인
 //---------------------------------------------------------------------------------------//
 app.post("/login", async (req, res) => {                                                 //
-  const { username, password } = req.body;                                               //
+  const { userid, password } = req.body;                                                 //
   try {                                                                                  //
     // username과 password를 인증 처리하고, 결과를 리턴하는 비동기 함수                    //
-    const result = await authenticate(username, password);                               //
+    const result = await authenticate(userid, password);                                 //
                                                                                          //
     if (result.success) {                                                                //
       res.send({ success: true, message: "인증되었습니다." });                            //
@@ -39,16 +39,38 @@ app.post("/login", async (req, res) => {                                        
 });                                                                                      //
 //---------------------------------------------------------------------------------------//
 
+//로그인검사
+//--------------------------------------------------------------------------------------------------------//
+async function authenticate(userid, password) {                                                           //
+  const query = `SELECT * FROM usertable WHERE userid = '${userid}' AND password = '${password}'`;        //
+                                                                                                          //
+  // db.query를 Promise로 변경                                                                            //
+  const queryPromise = util.promisify(db.query).bind(db);                                                 //
+                                                                                                          //
+  try {                                                                                                   //
+    const result = await queryPromise(query);                                                             //
+    // 검색 결과가 없거나 에러가 발생한 경우                                                                //
+    if (result.length === 0) {                                                                            //
+      return { success: false };                                                                          //
+    }                                                                                                     //  
+    // 검색 결과가 있으면 인증 성공                                                                        //
+    return { success: true };                                                                             //
+  } catch (error) {                                                                                       //
+    return {success: false};                                                                              //
+  }                                                                                                       //
+}                                                                                                         //
+//--------------------------------------------------------------------------------------------------------//
+
 // 회원가입
 //-------------------------------------------------------------------------------------------------------//
 app.post("/register", async (req, res) => {                                                              //
-  const { username, password } = req.body;                                                               //
+  const { userid, name, password } = req.body;                                                           //
   try {                                                                                                  //
-    const userExists = await checkIfUserExists(username);                                                //
+    const userExists = await checkIfUserExists(userid);                                                  //
     if (userExists) {                                                                                    //
       res.send({ success: false, message: "이미 존재하는 유저입니다." });                                 //
     } else {                                                                                             //
-      const query = `INSERT INTO usertable (username, password) VALUES ('${username}', '${password}')`;  //
+      const query = `INSERT INTO usertable (userid, password, name) VALUES ('${userid}', '${password}', '${name}')`;//
       // db.query를 Promise로 변경                                                                       //
       const queryPromise = util.promisify(db.query).bind(db);                                            //
       await queryPromise(query);                                                                         //
@@ -61,30 +83,10 @@ app.post("/register", async (req, res) => {                                     
 });                                                                                                      //
 //-------------------------------------------------------------------------------------------------------//
 
-//회원가입 처리
-//--------------------------------------------------------------------------------------------------------//
-async function registerUser(username, password) {                                                         //
-  const query = `INSERT INTO usertable (username, password) VALUES ('${username}', '${password}')`;       //
-                                                                                                          //
-  // db.query를 Promise로 변경                                                                            //
-  const queryPromise = util.promisify(db.query).bind(db);                                                 //
-                                                                                                          //
-  try {                                                                                                   //
-    const result = await queryPromise(query);                                                             //
-    if (result.affectedRows === 1) {                                                                      //
-      return { success: true };                                                                           //
-    }                                                                                                     //
-    return { success: false };                                                                            //
-  } catch (error) {                                                                                       //
-    return {success: false};                                                                              //
-  }                                                                                                       //
-}                                                                                                         //
-//--------------------------------------------------------------------------------------------------------//
-
 // 회원가입 시 기존에 존재하는 유저인지 확인하는 함수
 //--------------------------------------------------------------------------------------------------------//
-async function checkIfUserExists(username) {                                                              //
-  const query = `SELECT * FROM usertable WHERE username = '${username}'`;                                 //
+async function checkIfUserExists(userid) {                                                                //
+  const query = `SELECT * FROM usertable WHERE userid = '${userid}'`;                                     //
                                                                                                           //
   // db.query를 Promise로 변경                                                                            //
   const queryPromise = util.promisify(db.query).bind(db);                                                 //

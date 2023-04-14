@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function SignUp() {
   const [inputId, setInputId] = useState("");
   const [inputPw, setInputPw] = useState("");
   const [inputName, setInputName] = useState("");
+  const navigate = useNavigate();
 
   // input data 의 변화가 있을 때마다 value 값을 변경해서 useState 해준다
   const handleInputId = (e) => {
@@ -31,6 +33,12 @@ function SignUp() {
     axios.post("http://localhost:3001/register", data)
       .then((response) => {
         console.log(response.data);
+        if(response.data.success === true){
+          alert("회원가입에 성공했습니다!");
+          navigate('/login');
+        }else{
+          alert("이미 존재하는 회원정보입니다.");
+        }        
       })
       .catch((error) => {
         console.log(error);

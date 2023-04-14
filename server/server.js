@@ -6,7 +6,6 @@ const bodyParser = require("body-parser");
 const util = require("util");
 
 app.use(bodyParser.json());
-
 app.use(cors());
 
 app.get("/mysql", (req, res) => {
@@ -106,6 +105,40 @@ async function checkIfUserExists(userid) {                                      
 }                                                                                                         //
 //--------------------------------------------------------------------------------------------------------//
 
+
+//-------Diary page 내용 DB에 저장--------------------------------------------------------------------------------------------------------------------------//
+app.post('/exercises', (req, res) => {                                                                                                                      //
+  const {                                                                                                                                                   //
+    userid, date, exercise1, exercise2, exercise3, exercise4, exercise5, exercise6                                                                          //
+  } = req.body;                                                                                                                                             //
+                                                                                                                                                            //
+  console.log(req.body);                                                                                                                                    //
+                                                                                                                                                            //
+  const insertQuery = `                                                                                                                                     
+  INSERT INTO diary (userid, url, exercise1, field1, exercise2, field2, exercise3, field3, exercise4, field4, exercise5, field5, exercise6, field6)         
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+  `;
+                                                                                                                                                            //
+  const values = [                                                                                                                                          //
+    userid, date,                                                                                                                                           //
+    exercise1.name, exercise1.content,                                                                                                                      //
+    exercise2.name, exercise2.content,                                                                                                                      //
+    exercise3.name, exercise3.content,                                                                                                                      //
+    exercise4.name, exercise4.content,                                                                                                                      //
+    exercise5.name, exercise5.content,                                                                                                                      //
+    exercise6.name, exercise6.content,                                                                                                                      //
+  ];                                                                                                                                                        //
+                                                                                                    //--------------------------------------------------------
+  db.query(insertQuery, values, (error) => {                                                        //
+    if (error) {                                                                                    //
+      res.status(500).json({ message: 'Error saving exercise data to the database.', error });      //
+      return;                                                                                       //
+    }                                                                                               //
+    res.status(201).json({ message: 'Exercise data saved to the database.' });                      //
+  });                                                                                               //
+});                                                                                                 //
+                                                                                                    //
+//--------------------------------------------------------------------------------------------------//
 
 const port = 3001;
 app.listen(port, () =>

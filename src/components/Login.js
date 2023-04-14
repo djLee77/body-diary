@@ -17,6 +17,10 @@ function Login() {
     setInputPw(e.target.value);
   };
 
+  const onClickSignUp = (e) => {
+    navigate('/signup');
+  };
+
   // login 버튼 클릭 이벤트
   const onClickLogin = () => {
     console.log("click login");
@@ -36,7 +40,10 @@ function Login() {
 
         if (localStorage.getItem("isLogin") === "true") {
           console.log("Login success");
+          localStorage.setItem("userid", inputId);
           navigate('/');
+        }else{
+          alert("ID 혹은 Password를 확인해주세요.");
         }
       })
       .catch((error) => {
@@ -79,6 +86,9 @@ function Login() {
       <div>
         <button type="button" onClick={onClickLogin}>
           Login
+        </button>
+        <button type="button" onClick={onClickSignUp}>
+          SignUp
         </button>
       </div>
     </div>

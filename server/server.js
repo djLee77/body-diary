@@ -140,6 +140,48 @@ app.post('/exercises', (req, res) => {                                          
                                                                                                     //
 //--------------------------------------------------------------------------------------------------//
 
+
+//기존 다이어리가 있는지 검사-----------------------------------------------------------------------------//
+app.post('/diary_url', async(req,res) => {                                                                //
+  const{userid, date} = req.body;                                                                        //
+  try {                                                                                                  //
+    const diaryExists = await checkIfDiaryExists(userid, date);                                          //
+    if (diaryExists) {                                                                                   //
+      res.send({ exist: true });                                                                         //
+    } else {                                                                                             //                                                                         //
+      res.send({ exist: false });                                                                        //
+    }                                                                                                    //
+  } catch (error) {                                                                                      //
+    console.error(error);                                                                                //
+    res.status(500).send({ success: false, message: "서버 오류입니다." });                                //
+  }                                                                                                      //
+})                                                                                                       //
+//-------------------------------------------------------------------------------------------------------//
+
+
+// 해당 날짜가 db에 존재하는지 검사
+//--------------------------------------------------------------------------------------------------------//
+async function checkIfDiaryExists(userid, date) {                                                         //
+  const query = `SELECT url FROM diary WHERE userid = '${userid}' and url = '${date}'`;                   //
+                                                                                                          //
+  // db.query를 Promise로 변경                                                                            //
+  const queryPromise = util.promisify(db.query).bind(db);                                                 //
+                                                                                                          //
+  try {                                                                                                   //
+    const result = await queryPromise(query);                                                             //
+    // 검색 결과가 없거나 에러가 발생한 경우                                                               //
+    if (result.length === 0) {                                                                            //
+      return false;                                                                                       //
+    } else {                                                                                              //
+      return true;                                                                                        //
+    }                                                                                                     //
+  } catch (error) {                                                                                       //
+    console.error(error);                                                                                 //
+    return true;                                                                                          //
+  }                                                                                                       //
+}                                                                                                         //
+//--------------------------------------------------------------------------------------------------------//
+
 const port = 3001;
 app.listen(port, () =>
   console.log(`Node.js Server is running on port ${port}...`)

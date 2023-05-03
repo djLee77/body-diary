@@ -47,7 +47,7 @@ const CalendarComponent = () => {
       .then((response) => {                                         //
         console.log(response.data.exist)                            //
         if(response.data.exist === true){                           //
-          console.log("exist");                                     //
+          navigate(`/diary_view/${dateString}`)                     //
         }else{                                                      //
           navigate(`/diary/${dateString}`);                         //
         }                                                           //
@@ -59,6 +59,42 @@ const CalendarComponent = () => {
   };                                                                //
 //------------------------------------------------------------------//
 
+//------------------문자열 -> 날짜-----------------------------------//
+const parseDateString = (dateString) => {                           // 
+  const [year, month, day] = dateString.split("-").map(Number);     //
+  return new Date(year, month - 1, day);                            //
+};                                                                  //
+//------------------------------------------------------------------//
+
+//-----------------캘린더 날짜 타이틀 설정 함수----------------------------------------//
+const renderTileContent = ({ date, view }) => {
+  if (view === "month") {
+    const customDates = [
+      "2023-05-05", // 2023년 5월 5일
+      "2023-05-10", // 2023년 5월 10일
+    ];
+
+    const isCustomDate = customDates.some((customDateString) => {
+      const customDate = parseDateString(customDateString);
+      return (
+        customDate.getDate() === date.getDate() &&
+        customDate.getMonth() === date.getMonth() &&
+        customDate.getFullYear() === date.getFullYear()
+      );
+    });
+
+    if (isCustomDate) {
+      return (
+          <div className="customTitle">어깨</div>
+      );
+    } else {
+      return null;
+    }
+  }
+  return null;
+};                                                          //
+//------------------------------------------------------------------------------------//
+
 
 //------페이지 구성--------------------------------------------------//
   return (                                                          //
@@ -67,7 +103,7 @@ const CalendarComponent = () => {
       <Calendar 
       onChange={onChange} 
       value={value}
-      // tileContent={renderTileContent} 
+      tileContent={renderTileContent} 
       />
       
     </div>

@@ -1,0 +1,69 @@
+import React, { useState, useEffect} from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+
+const DiaryView = () => {
+
+//--------페이지 데이터 변수들------------------------------//  
+     const { date } = useParams();                            //
+//   const [exerciseData, setExerciseData] = useState({       //
+//     exercise1: { name: '', content: '' },                  //
+//     exercise2: { name: '', content: '' },                  //
+//     exercise3: { name: '', content: '' },                  //
+//     exercise4: { name: '', content: '' },                  //
+//     exercise5: { name: '', content: '' },                  //
+//     exercise6: { name: '', content: '' },                  //
+//   });                                                      //
+//---------------------------------------------------------//
+
+
+//--------운동 종목, 운동내용 input값----------------------------------------------------------------------//
+//   const handleChange = (e, exerciseKey) => {                                                              //
+//     const { name, value } = e.target;                                                                     //
+//     setExerciseData({                                                                                     //
+//       ...exerciseData,                                                                                    //
+//       [exerciseKey]: { ...exerciseData[exerciseKey], [name]: value },                                     //
+//     });                                                                                                   //
+//   };                                                                                                      //
+//--------------------------------------------------------------------------------------------------------//
+
+
+//-----------저장버튼 클릭시 실행 함수---------------------------------------------------------------------//
+//   const handleSubmit = async (e) => {                                                                     //
+//     e.preventDefault();                                                                                   //
+//     try {                                                                                                 //
+//       const response = await axios.post('http://localhost:3001/exercises', {                              //
+//         userid: localStorage.getItem("userid"),                                                           //
+//         date: date,                                                                                       //
+//         ...exerciseData                                                                                   //
+//       });                                                                                                 //
+//       console.log('Server response:', response.data);                                                     //
+//       alert("저장되었습니다.");                                                                            //
+//     } catch (error) {                                                                                     //
+//       console.error('Error sending data to server:', error);                                              //
+//     }                                                                                                     //
+//   };                                                                                                      //
+//--------------------------------------------------------------------------------------------------------//
+
+
+//---------useEffect-------------------------------------//
+  useEffect(                                             //
+    () => {                                              //
+      console.log(localStorage.getItem("userid"));       //
+    }                                                    //
+  // 페이지 호출 후 처음 한번만 호출될 수 있도록 [] 추가   //
+  );                                                     //
+//-------------------------------------------------------//
+
+
+//-----------페이지 구성--------------------------------------------//
+  return (                                                          //
+    <div>
+      <h2>{date}</h2>
+      <h1>운동 다이어리 view 페이지</h1>
+    </div>
+  );                                                               //
+};                                                                 //
+//-----------------------------------------------------------------//
+
+export default DiaryView;

@@ -1,12 +1,12 @@
 import React, { useState, useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
 
 const DiaryPage = () => {
 
 //--------페이지 데이터 변수들------------------------------//  
   const { date } = useParams();                            //
+  const [title, setTitle] = useState("");                  //
   const [exerciseData, setExerciseData] = useState({       //
     exercise1: { name: '', content: '' },                  //
     exercise2: { name: '', content: '' },                  //
@@ -17,6 +17,9 @@ const DiaryPage = () => {
   });                                                      //
 //---------------------------------------------------------//
 
+const handleTitle = (e) => {
+  setTitle(e.target.value);                                                                                                   //
+};   
 
 //--------운동 종목, 운동내용 input값----------------------------------------------------------------------//
   const handleChange = (e, exerciseKey) => {                                                              //
@@ -35,7 +38,8 @@ const DiaryPage = () => {
     try {                                                                                                 //
       const response = await axios.post('http://localhost:3001/exercises', {                              //
         userid: localStorage.getItem("userid"),                                                           //
-        date: date,                                                                                       //
+        date: date,
+        title: title,                                                                                       //
         ...exerciseData                                                                                   //
       });                                                                                                 //
       console.log('Server response:', response.data);                                                     //
@@ -50,7 +54,7 @@ const DiaryPage = () => {
 //---------useEffect-------------------------------------//
   useEffect(                                             //
     () => {                                              //
-      console.log(localStorage.getItem("userid"));       //
+      console.log(date);       //
     }                                                    //
   // 페이지 호출 후 처음 한번만 호출될 수 있도록 [] 추가   //
   );                                                     //
@@ -62,6 +66,7 @@ const DiaryPage = () => {
     <div>
       <h2>{date}</h2>
       <h1>운동 다이어리</h1>
+      <input onChange={handleTitle}></input>
       <form onSubmit={handleSubmit}>
         {Object.keys(exerciseData).map((exerciseKey) => (
           <div key={exerciseKey}>

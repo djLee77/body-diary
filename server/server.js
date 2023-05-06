@@ -109,18 +109,18 @@ async function checkIfUserExists(userid) {                                      
 //-------Diary page 내용 DB에 저장--------------------------------------------------------------------------------------------------------------------------//
 app.post('/exercises', (req, res) => {                                                                                                                      //
   const {                                                                                                                                                   //
-    userid, date, exercise1, exercise2, exercise3, exercise4, exercise5, exercise6                                                                          //
+    userid, date, title, exercise1, exercise2, exercise3, exercise4, exercise5, exercise6                                                                          //
   } = req.body;                                                                                                                                             //
                                                                                                                                                             //
   console.log(req.body);                                                                                                                                    //
                                                                                                                                                             //
   const insertQuery = `                                                                                                                                     
-  INSERT INTO diary (userid, url, exercise1, field1, exercise2, field2, exercise3, field3, exercise4, field4, exercise5, field5, exercise6, field6)         
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+  INSERT INTO diary (userid, url, title, exercise1, field1, exercise2, field2, exercise3, field3, exercise4, field4, exercise5, field5, exercise6, field6)         
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
                                                                                                                                                             //
   const values = [                                                                                                                                          //
-    userid, date,                                                                                                                                           //
+    userid, date, title,                                                                                                                                          //
     exercise1.name, exercise1.content,                                                                                                                      //
     exercise2.name, exercise2.content,                                                                                                                      //
     exercise3.name, exercise3.content,                                                                                                                      //
@@ -142,12 +142,20 @@ app.post('/exercises', (req, res) => {                                          
 
 
 //기존 다이어리가 있는지 검사-----------------------------------------------------------------------------//
-app.post('/diary_url', async(req,res) => {                                                                //
+app.post('/diary_url', async(req,res) => {                                                               //
   const{userid, date} = req.body;                                                                        //
   try {                                                                                                  //
     const diaryExists = await checkIfDiaryExists(userid, date);                                          //
     if (diaryExists) {                                                                                   //
-      res.send({ exist: true });                                                                         //
+      const selectQuery = `SELECT title FROM diary WHERE userid = ? AND url = ?`;                        //
+      db.query(selectQuery, [userid, date], (error, result) => {                                         //
+        if (error) {                                                                                     //
+          res.status(500).send({ success: false, message: "서버 오류입니다." });                          //
+        } else {                                                                                         //
+          const title = result[0].title;                                                                 //
+          res.send({ exist: true, title });                                                              //
+        }                                                                                                //
+      });                                                                                                //
     } else {                                                                                             //                                                                         //
       res.send({ exist: false });                                                                        //
     }                                                                                                    //
@@ -181,6 +189,53 @@ async function checkIfDiaryExists(userid, date) {                               
   }                                                                                                       //
 }                                                                                                         //
 //--------------------------------------------------------------------------------------------------------//
+
+//----------------------------diary view에 데이터 전송----------------------------------------------------//
+app.post('/diary_data', async (req, res) => {                                                            //
+  const { userid, date } = req.body;                                                                     //
+                                                                                       //                                                                                                       //
+  try {                                                                                                  //
+    const diaryData = await getDiaryData(userid, date);                                                  //
+    res.send(diaryData);                                                                                 //
+  } catch (error) {                                                                                      //
+    console.error(error);                                                                                //
+    res.status(500).send({ success: false, message: '서버 오류입니다.' });                                //
+  }                                                                                                      //
+});                                                                                                      //
+                                                                                                         //
+async function getDiaryData(userid, date) {                                                              //
+  const query = `SELECT * FROM diary WHERE userid = '${userid}' and url = '${date}'`;                    //
+                                                                                                         //
+  const queryPromise = util.promisify(db.query).bind(db);                                                //
+                                                                                                         //
+  try {                                                                                                  //
+    const result = await queryPromise(query);                                                            //
+                                                                                                         //
+    if (result.length === 0) {                                                                           //
+      return null                                                                                        //
+    } else {                                                                                             //
+      const diary = result[0];                                                                           //
+                                                                                                         //
+      const exercises = [                                                                                //
+        { name: diary.exercise1, content: diary.field1 },                                                //
+        { name: diary.exercise2, content: diary.field2 },                                                //
+        { name: diary.exercise3, content: diary.field3 },                                                //
+        { name: diary.exercise4, content: diary.field4 },                                                //
+        { name: diary.exercise5, content: diary.field5 },                                                //
+        { name: diary.exercise6, content: diary.field6 },                                                //
+      ].filter((exercise) => exercise.name && exercise.content);                                         //
+                                                                                                         //
+      return {                                                                                           //
+        title: diary.title,                                                                              //
+        exercises: exercises,                                                                            //
+      };                                                                                                 //
+    }                                                                                                    //
+  } catch (error) {                                                                                      //
+    console.error(error);                                                                                //
+    return null;                                                                                         //
+  }                                                                                                      //
+}                                                                                                        //
+//-------------------------------------------------------------------------------------------------------//
 
 const port = 3001;
 app.listen(port, () =>

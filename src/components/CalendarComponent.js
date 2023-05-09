@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "./CalendarComponent.css";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import axios from "axios";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
+import Explain1 from "./explains/explain1";
+import Explain2 from "./explains/explain2";
+import Explain3 from "./explains/explain3";
+import Explain4 from "./explains/explain4";
+import Explain5 from "./explains/explain5";
 
 const CalendarComponent = () => {
   useEffect(() => {
@@ -22,6 +26,8 @@ const CalendarComponent = () => {
   const navigate = useNavigate();
   const [tileContent, setTileContent] = useState([]);
   const [type, setType] = useState("");
+  const [programSchedule, setProgramSchedule] = useState({});
+  const [startDate, setStartDate] = useState("");
 
   useEffect(() => {
     const tiles = [];
@@ -37,15 +43,67 @@ const CalendarComponent = () => {
         }))
       )
     ).then(setTileContent);
-  }, [value]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  //db에서 프로그램 가져오는 로직
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post("http://localhost:3001/get_program", {
+          userid: localStorage.getItem("userid"),
+        });
+
+        setStartDate(response.data.date);
+        const schedule = createProgramSchedule(response.data.schedule);
+        setProgramSchedule(schedule);
+        console.log(programSchedule);
+      } catch (error) {
+        console.error("Error fetching diary data:", error);
+      }
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, programSchedule]);
 
   const handleType = (e) => {
     setType(e.target.value);
   };
 
+  const saveProgramSchedule = async (type) => {
+    try {
+      console.log(type);
+      const response = await axios.post(
+        "http://localhost:3001/program_schedule",
+        {
+          userid: localStorage.getItem("userid"),
+          schedule: type,
+          date: toLocalDateString(new Date()),
+        }
+      );
+      console.log("Server response:", response.data);
+    } catch (error) {
+      console.error("Error sending data to server:", error);
+    }
+  };
+
   const getType = (e) => {
     console.log(type);
+    saveProgramSchedule(type);
   };
+  const createProgramSchedule = (type) => {
+    const schedule = {};
+    const parsedStartDate = new Date(startDate);
+
+    for (let i = 1; i <= 42; i++) {
+      const date = addDays(parsedStartDate, i);
+      schedule[toLocalDateString(date)] = `${type}${i}`;
+    }
+
+    return schedule;
+  };
+
   const onChange = (nextValue) => {
     setValue(nextValue);
     const dateString = toLocalDateString(nextValue);
@@ -59,7 +117,9 @@ const CalendarComponent = () => {
         if (response.data.exist === true) {
           navigate(`/diary_view/${dateString}`);
         } else {
-          navigate(`/diary/${dateString}`);
+          navigate(`/diary/${dateString}`, {
+            state: { programTodo: programSchedule[dateString] },
+          });
         }
       })
       .catch((error) => {
@@ -80,6 +140,10 @@ const CalendarComponent = () => {
         .then((response) => {
           if (response.data.exist === true) {
             return <div className="customTitle">{response.data.title}</div>;
+          } else if (programSchedule[dateString]) {
+            return (
+              <div className="customTitle">{programSchedule[dateString]}</div>
+            );
           } else {
             return null;
           }
@@ -95,32 +159,42 @@ const CalendarComponent = () => {
   return (
     <div className="background">
       <div className="bg_left">
-        <div style={{border : "1px solid #d0d7de" , width : "100%"}}>
-          <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel id="demo-simple-select-standard-label">Programs</InputLabel>
-            <Select
-              labelId="demo-simple-select-standard-label"
-              id="demo-simple-select-standard"
-              value={type}
-              onChange={handleType}
-              label="Programs"
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              <MenuItem value={1}>Candito 6 Week Strength</MenuItem>
-              <MenuItem value={2}>PHUL</MenuItem>
-              <MenuItem value={3}>PHAT</MenuItem>
-              <MenuItem value={4}>HST</MenuItem>
-              <MenuItem value={5}>why do not 5x5?</MenuItem>
-            </Select>
-          </FormControl>
-          <div style={{float: "right" , paddingTop : "20px"}}>
-            <Button variant="text"  sx={{ color: 'grey' }} onClick={getType}>
+        <div style={{ borderBottom: "1px solid #d0d7de", width: "500px" }}>
+          <div style={{ float: "left" }}>
+            <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+              <InputLabel id="demo-simple-select-standard-label">
+                Programs
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-standard-label"
+                id="demo-simple-select-standard"
+                value={type}
+                onChange={handleType}
+                label="Programs"
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={"Candito"}>Candito 6 Week Strength</MenuItem>
+                <MenuItem value={"PHUL"}>PHUL</MenuItem>
+                <MenuItem value={"PHAT"}>PHAT</MenuItem>
+                <MenuItem value={"HST"}>HST</MenuItem>
+                <MenuItem value={"5x5"}>why do not 5x5?</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+          <div style={{ paddingTop: "20px" }}>
+            <Button variant="text" sx={{ color: "grey" }} onClick={getType}>
               select
             </Button>
           </div>
-          
+        </div>
+        <div className="bg_right_bottom">
+          {type === "Candito" && <Explain1></Explain1>}
+          {type === "PHUL" && <Explain2></Explain2>}
+          {type === "PHAT" && <Explain3></Explain3>}
+          {type === "HST" && <Explain4></Explain4>}
+          {type === "5x5" && <Explain5></Explain5>}
         </div>
       </div>
       <div className="bg_right">
@@ -129,20 +203,22 @@ const CalendarComponent = () => {
             You've been stronger for 10 days, and go to the gym again today
           </h5>
         </div>
-        <Calendar
-          locale="en-GB"
-          onChange={onChange}
-          value={value}
-          tileContent={({ date, view }) => {
-            const tile = tileContent.find(
-              (t) =>
-                isSameDay(t.date, date) &&
-                (view === "month" || view === "year") &&
-                t.content !== null
-            );
-            return tile?.content ?? null;
-          }}
-        />
+        <div className="Calendar_box">
+          <Calendar
+            locale="en-GB"
+            onChange={onChange}
+            value={value}
+            tileContent={({ date, view }) => {
+              const tile = tileContent.find(
+                (t) =>
+                  isSameDay(t.date, date) &&
+                  (view === "month" || view === "year") &&
+                  t.content !== null
+              );
+              return tile?.content ?? null;
+            }}
+          />
+        </div>
       </div>
     </div>
   );

@@ -42,6 +42,7 @@ const Navbar = () => {
 
   return (
     <nav className="navbar navbar-expand-custom navbar-mainbg">
+      {/* <div style={{float:"left", color:"white", padding:"15px", paddingBottom:"0px"}}><p>Body Diary</p></div> */}
       <div className="collapse navbar-collapse" id="navbarSupportedContent">
         <ul className="navbar-nav ml-auto">
           <div className="hori-selector">

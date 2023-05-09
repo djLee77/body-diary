@@ -193,7 +193,7 @@ async function checkIfDiaryExists(userid, date) {                               
 //----------------------------diary view에 데이터 전송----------------------------------------------------//
 app.post('/diary_data', async (req, res) => {                                                            //
   const { userid, date } = req.body;                                                                     //
-                                                                                       //                                                                                                       //
+                                                                                                         //
   try {                                                                                                  //
     const diaryData = await getDiaryData(userid, date);                                                  //
     res.send(diaryData);                                                                                 //
@@ -236,6 +236,58 @@ async function getDiaryData(userid, date) {                                     
   }                                                                                                      //
 }                                                                                                        //
 //-------------------------------------------------------------------------------------------------------//
+
+app.post("/program_schedule", async (req, res) => {
+  const { userid, schedule, date } = req.body;
+
+  // 프로그램 일정을 데이터베이스에 저장하는 코드
+  const sql = "INSERT INTO programs (userid, schedule, date) VALUES (?, ?, ?)";
+  const values = [userid, schedule, date];
+
+  try {
+    await db.query(sql, values);
+    res.send("Program schedule saved.");
+  } catch (err) {
+    console.error("Error inserting program schedule:", err);
+    res.status(500).send("Error saving program schedule.");
+  }
+});
+//----------------------------------------------------------------------------------------------------------
+
+app.post("/get_program", async (req, res) => {
+  const {userid} = req.body;
+  try {                                                                                                    //
+    const program = await getProgram(userid);                                                              //
+    res.send(program);                                                                                     //
+  } catch (error) {                                                                                        //
+    console.error(error);                                                                                  //
+    res.status(500).send({ success: false, message: '서버 오류입니다.' });                                  //
+  }                                                                                                        //
+                                                                                                           //
+  async function getProgram(userid) {                                                                      //
+    const query = `SELECT * FROM programs WHERE userid = '${userid}'`;                                     //
+                                                                                                           //
+    const queryPromise = util.promisify(db.query).bind(db);                                                //
+                                                                                                           //
+    try {                                                                                                  //
+      const result = await queryPromise(query);                                                            //
+                                                                                                           //
+      if (result.length === 0) {                                                                           //
+        return null                                                                                        //
+      } else {                                                                                             //
+        const row = result[0];                                                                             // 
+        return {                                                                                           //
+          date: row.date,                                                                                  //
+          schedule: row.schedule                                                                           //
+        };                                                                                                 //
+      }                                                                                                    //
+    } catch (error) {                                                                                      //
+      console.error(error);                                                                                //
+      return null;                                                                                         //
+    }                                                                                                      //
+  }                      
+});
+
 
 const port = 3001;
 app.listen(port, () =>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import {Link, useNavigate } from "react-router-dom";
+import "./Login.css"
 
 function SignUp() {
   const [inputId, setInputId] = useState("");
@@ -21,24 +22,28 @@ function SignUp() {
     setInputName(e.target.value);
   };
 
+  // const onClickSignIn = () =>{
+  //   navigate("/login");
+  // }
+
   // 회원가입 버튼 클릭 이벤트
   const onClickSignUp = () => {
     console.log("click SignUp");
     const data = {
-      userid : inputId,
-      password : inputPw,
-      name : inputName
-    }
-
-    axios.post("http://localhost:3001/register", data)
+      userid: inputId,
+      password: inputPw,
+      name: inputName,
+    };  
+    axios
+      .post("http://localhost:3001/register", data)
       .then((response) => {
         console.log(response.data);
-        if(response.data.success === true){
+        if (response.data.success === true) {
           alert("회원가입에 성공했습니다!");
-          navigate('/login');
-        }else{
+          navigate("/login");
+        } else {
           alert("이미 존재하는 회원정보입니다.");
-        }        
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -60,7 +65,7 @@ function SignUp() {
 
   return (
     <div>
-      <h2>SignUp</h2>
+      {/* <h2>SignUp</h2>
       <div>
         <label htmlFor="input_id">ID : </label>
         <input
@@ -92,6 +97,40 @@ function SignUp() {
         <button type="button" onClick={onClickSignUp}>
           SignUp
         </button>
+      </div> */}
+
+      <div class="login-page">
+        <div class="form">
+          <form class="register-form">
+            <input
+              type="text"
+              name="input_id"
+              value={inputId}
+              onChange={handleInputId}
+              placeholder="id"
+            />
+            <input
+              type="password"
+              name="input_pw"
+              value={inputPw}
+              onChange={handleInputPw}
+              placeholder="password"
+            />
+            <input
+              type="name"
+              name="input_name"
+              value={inputName}
+              onChange={handleInputName}
+              placeholder="name"
+            />
+            <button type="button" onClick={onClickSignUp}>
+              create
+            </button>
+            <p class="message">
+              Already registered? <Link to = {'/login'}>Sign In</Link>
+            </p>
+          </form>
+        </div>
       </div>
     </div>
   );

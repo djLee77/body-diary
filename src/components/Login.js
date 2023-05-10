@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import "./Login.css";
+
 function Login() {
   const [inputId, setInputId] = useState("");
   const [inputPw, setInputPw] = useState("");
-  
+
   const navigate = useNavigate();
 
   // const [isLogin, setIsLogin] = useState(false);
@@ -17,9 +19,9 @@ function Login() {
     setInputPw(e.target.value);
   };
 
-  const onClickSignUp = (e) => {
-    navigate('/signup');
-  };
+  // const onClickSignUp = (e) => {
+  //   navigate("/signup");
+  // };
 
   // login 버튼 클릭 이벤트
   const onClickLogin = () => {
@@ -41,8 +43,8 @@ function Login() {
         if (localStorage.getItem("isLogin") === "true") {
           console.log("Login success");
           localStorage.setItem("userid", inputId);
-          navigate('/');
-        }else{
+          navigate("/calendar");
+        } else {
           alert("ID 혹은 Password를 확인해주세요.");
         }
       })
@@ -59,37 +61,34 @@ function Login() {
         console.log("Login success");
       }
     }
-  // 페이지 호출 후 처음 한번만 호출될 수 있도록 [] 추가
+    // 페이지 호출 후 처음 한번만 호출될 수 있도록 [] 추가
   );
 
   return (
-    <div>
-      <h2>Login</h2>
-      <div>
-        <label htmlFor="input_id">ID : </label>
-        <input
-          type="text"
-          name="input_id"
-          value={inputId}
-          onChange={handleInputId}
-        />
-      </div>
-      <div>
-        <label htmlFor="input_pw">PW : </label>
-        <input
-          type="password"
-          name="input_pw"
-          value={inputPw}
-          onChange={handleInputPw}
-        />
-      </div>
-      <div>
-        <button type="button" onClick={onClickLogin}>
-          Login
-        </button>
-        <button type="button" onClick={onClickSignUp}>
-          SignUp
-        </button>
+    <div className="login_body">
+      <div class="login-page">
+        <div class="form">
+          <form class="login-form">
+            <input
+              type="text"
+              placeholder="username"
+              value={inputId}
+              onChange={handleInputId}
+            />
+            <input
+              type="password"
+              placeholder="password"
+              value={inputPw}
+              onChange={handleInputPw}
+            />
+            <button type="button" onClick={onClickLogin}>
+              login
+            </button>
+            <p class="message">
+              Not registered? <Link to={'/signup'}>Create an account</Link>
+            </p>
+          </form>
+        </div>
       </div>
     </div>
   );

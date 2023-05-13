@@ -19,6 +19,7 @@ const DiaryPage = () => {
   //--------페이지 데이터 변수들------------------------------//
   const { date } = useParams(); //
   const [title, setTitle] = useState(""); //
+  const [maxWeight, setMaxWeight ] = useState(0);
   const [exerciseData, setExerciseData] = useState({
     //
     exercise1: { name: "", content: "" }, //
@@ -34,6 +35,10 @@ const DiaryPage = () => {
 
   const handleTitle = (e) => {
     setTitle(e.target.value); //
+  };
+
+  const handleMaxWeight = (e) => {
+    setMaxWeight(e.target.value); //
   };
 
   //--------운동 종목, 운동내용 input값----------------------------------------------------------------------//
@@ -59,6 +64,7 @@ const DiaryPage = () => {
         userid: localStorage.getItem("userid"), //
         date: date,
         title: title, //
+        maxWeight: maxWeight,
         ...exerciseData, //
       }); //
       console.log("Server response:", response.data); //
@@ -85,10 +91,13 @@ const DiaryPage = () => {
   return (
     //
     <div>
-      <div style={{float:"right", marginRight:"50%"}}>
+      <div style={{ float: "right", marginRight: "50%" }}>
         <h2>{date}</h2>
         <h1>운동 다이어리</h1>
-        <input onChange={handleTitle}></input>
+        <div>
+          <p>제목</p>
+          <input onChange={handleTitle}></input>
+        </div>
         <form onSubmit={handleSubmit}>
           {Object.keys(exerciseData).map((exerciseKey) => (
             <div key={exerciseKey}>
@@ -108,6 +117,11 @@ const DiaryPage = () => {
               />
             </div>
           ))}
+
+          <div>
+            <p>1RM</p>
+            <input type="text" onChange={handleMaxWeight}></input>
+          </div>
           <button type="submit">저장</button>
         </form>
       </div>

@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route} from 'react-router-dom'
 import Navbar from './components/Navbar';
 import Layout from './components/Layout';
 import MyPage from './components/MyPage'
-import Chart from './components/Chart'
+import Chart from './components/ChartPage'
 
 function App() {
   return (    

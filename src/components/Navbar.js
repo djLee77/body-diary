@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Navbar.css";
 import { NavLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ const Navbar = () => {
   };
 
   const handleLogoutClick = (e) => {
-    localStorage.setItem("isLogin", "false");          
+    localStorage.setItem("isLogin", "false");
     navigate("/login");
   };
 
@@ -38,6 +38,7 @@ const Navbar = () => {
     return () => {
       window.removeEventListener("resize", updateSelectorPosition);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeElement]);
 
   return (
@@ -73,9 +74,17 @@ const Navbar = () => {
               Mypage
             </NavLink>
           </li>
-          <li className="nav-item" onClick={handleLogoutClick}>
-            <a style = {{cursor : "pointer"}}>Logout</a>
-          </li>
+          <div style={{float: "right"}}>
+            {localStorage.getItem("isLogin") === "false" ? (
+              <li>
+                <a style={{padding :"0px"}}><Link to = "/login">Login</Link></a>
+              </li>
+            ) : (
+              <li className="nav-item" onClick={handleLogoutClick}>
+                <a style={{ cursor: "pointer" }}>Logout</a>
+              </li>
+            )}
+          </div>
         </ul>
       </div>
     </nav>

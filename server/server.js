@@ -109,18 +109,18 @@ async function checkIfUserExists(userid) {                                      
 //-------Diary page 내용 DB에 저장--------------------------------------------------------------------------------------------------------------------------//
 app.post('/exercises', (req, res) => {                                                                                                                      //
   const {                                                                                                                                                   //
-    userid, date, title, exercise1, exercise2, exercise3, exercise4, exercise5, exercise6                                                                          //
+    userid, date, title, maxWeight, exercise1, exercise2, exercise3, exercise4, exercise5, exercise6                                                                          //
   } = req.body;                                                                                                                                             //
                                                                                                                                                             //
   console.log(req.body);                                                                                                                                    //
                                                                                                                                                             //
   const insertQuery = `                                                                                                                                     
-  INSERT INTO diary (userid, url, title, exercise1, field1, exercise2, field2, exercise3, field3, exercise4, field4, exercise5, field5, exercise6, field6)         
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+  INSERT INTO diary (userid, url, title, max, exercise1, field1, exercise2, field2, exercise3, field3, exercise4, field4, exercise5, field5, exercise6, field6)         
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
                                                                                                                                                             //
   const values = [                                                                                                                                          //
-    userid, date, title,                                                                                                                                          //
+    userid, date, title, maxWeight,                                                                                                                                         //
     exercise1.name, exercise1.content,                                                                                                                      //
     exercise2.name, exercise2.content,                                                                                                                      //
     exercise3.name, exercise3.content,                                                                                                                      //
@@ -252,10 +252,10 @@ app.post("/program_schedule", async (req, res) => {
     res.status(500).send("Error saving program schedule.");
   }
 });
-//----------------------------------------------------------------------------------------------------------
-
-app.post("/get_program", async (req, res) => {
-  const {userid} = req.body;
+//---------------------------------------------------------------------------------------------------------//
+                                                                                                           //
+app.post("/get_program", async (req, res) => {                                                             //
+  const {userid} = req.body;                                                                               //
   try {                                                                                                    //
     const program = await getProgram(userid);                                                              //
     res.send(program);                                                                                     //
@@ -285,7 +285,25 @@ app.post("/get_program", async (req, res) => {
       console.error(error);                                                                                //
       return null;                                                                                         //
     }                                                                                                      //
-  }                      
+  }                                                                                                        //
+});                                                                                                        //
+//---------------------------------------------------------------------------------------------------------//
+
+const queryPromise = util.promisify(db.query).bind(db);
+
+app.get('/diary_data', async (req, res) => {
+  const { title, startDate, endDate } = req.query;
+
+  const query = `SELECT url, max FROM diary WHERE title = ? AND url BETWEEN ? AND ? ORDER BY url`;
+  const values = [title, startDate, endDate];
+
+  try {
+    const result = await queryPromise(query, values);
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ success: false, message: '서버 오류입니다.' });
+  }
 });
 
 

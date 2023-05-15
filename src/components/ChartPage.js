@@ -1,6 +1,15 @@
 import React, { useState } from "react";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+} from "recharts";
 import axios from "axios";
+import { Button } from "@mui/material";
+import "./ChartPage.css";
 
 const ChartPage = () => {
   const [startDate, setStartDate] = useState("");
@@ -21,11 +30,25 @@ const ChartPage = () => {
 
   return (
     <div>
-      <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
-      <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-      <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-      <button onClick={fetchData}>Load Chart</button>
-
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Title"
+      />
+      <input
+        type="date"
+        value={startDate}
+        onChange={(e) => setStartDate(e.target.value)}
+      />
+      <input
+        type="date"
+        value={endDate}
+        onChange={(e) => setEndDate(e.target.value)}
+      />
+      <Button variant="text" sx={{ color: "grey" }} onClick={fetchData}>
+        Load Chart
+      </Button>
       <LineChart width={500} height={300} data={chartData}>
         <Line type="monotone" dataKey="max" stroke="#8884d8" />
         <CartesianGrid stroke="#ccc" />

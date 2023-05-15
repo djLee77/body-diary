@@ -237,6 +237,37 @@ async function getDiaryData(userid, date) {                                     
 }                                                                                                        //
 //-------------------------------------------------------------------------------------------------------//
 
+app.post("/insert_program", async (req, res) => {
+  const { userid, schedule, date } = req.body;
+
+  // 프로그램 일정을 데이터베이스에 저장하는 코드
+  const sql = "INSERT INTO programs (userid, schedule, date) VALUES (?, ?, ?)";
+  const values = [userid, schedule, date];
+
+  try {
+    await db.query(sql, values);
+    res.send("Program schedule saved.");
+  } catch (err) {
+    console.error("Error inserting program schedule:", err);
+    res.status(500).send("Error saving program schedule.");
+  }
+});
+
+app.post("/delete_program", async (req, res) => {
+  const { userid } = req.body;
+
+  // 프로그램 일정을 데이터베이스서 삭제하는 코드
+  const sql = `DELETE FROM programs WHERE userid = '${userid}' `;
+
+  try {
+    await db.query(sql);
+    res.send("Program schedule deleted.");
+  } catch (err) {
+    console.error("Error delete program schedule:", err);
+    res.status(500).send("Error saving program schedule.");
+  }
+});
+
 app.post("/program_schedule", async (req, res) => {
   const { userid, schedule, date } = req.body;
 
@@ -252,6 +283,7 @@ app.post("/program_schedule", async (req, res) => {
     res.status(500).send("Error saving program schedule.");
   }
 });
+
 //---------------------------------------------------------------------------------------------------------//
                                                                                                            //
 app.post("/get_program", async (req, res) => {                                                             //

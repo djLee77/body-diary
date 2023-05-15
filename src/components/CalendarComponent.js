@@ -57,7 +57,6 @@ const CalendarComponent = () => {
         setStartDate(response.data.date);
         const schedule = createProgramSchedule(response.data.schedule);
         setProgramSchedule(schedule);
-        console.log(programSchedule);
       } catch (error) {
         console.error("Error fetching diary data:", error);
       }
@@ -75,7 +74,7 @@ const CalendarComponent = () => {
     try {
       console.log(type);
       const response = await axios.post(
-        "http://localhost:3001/program_schedule",
+        "http://localhost:3001/insert_program",
         {
           userid: localStorage.getItem("userid"),
           schedule: type,
@@ -98,11 +97,26 @@ const CalendarComponent = () => {
 
     for (let i = 1; i <= 42; i++) {
       const date = addDays(parsedStartDate, i);
-      schedule[toLocalDateString(date)] = `${type}${i}`;
+      schedule[toLocalDateString(date)] = `${type}+${i}`;
     }
 
     return schedule;
   };
+
+  const handleDelete = (e) => {
+    try {
+      console.log(type);
+      axios.post(
+        "http://localhost:3001/delete_program",
+        {
+          userid: localStorage.getItem("userid"),
+        }
+      );
+      
+    } catch (error) {
+      console.error("Error sending data to server:", error);
+    }
+  }
 
   const onChange = (nextValue) => {
     setValue(nextValue);
@@ -185,7 +199,10 @@ const CalendarComponent = () => {
           </div>
           <div style={{ paddingTop: "20px" }}>
             <Button variant="text" sx={{ color: "grey" }} onClick={getType}>
-              select
+              start
+            </Button>
+            <Button variant="text" sx={{ color: "grey" }} onClick={handleDelete}>
+              delete
             </Button>
           </div>
         </div>

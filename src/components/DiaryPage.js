@@ -1,134 +1,139 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
-import Candito1 from "./programs/Candito1";
-import Candito2 from "./programs/Candito2";
-import Candito3 from "./programs/Candito3";
-
-const programComponents = {
-  Candito1: Candito1,
-  Candito2: Candito2,
-  Candito3: Candito3,
-};
+import { Input, Checkbox, Button } from "@mui/material";
+import "./DiaryPage.css";
 
 const DiaryPage = () => {
   const location = useLocation();
   const programTodo = location.state?.programTodo;
 
-  //--------페이지 데이터 변수들------------------------------//
-  const { date } = useParams(); //
-  const [title, setTitle] = useState(""); //
-  const [maxWeight, setMaxWeight ] = useState(0);
+  const { date } = useParams();
+  const [title, setTitle] = useState("");
+  const [maxWeight, setMaxWeight] = useState(0);
+  const [programData, setProgramData] = useState(null);
   const [exerciseData, setExerciseData] = useState({
-    //
-    exercise1: { name: "", content: "" }, //
-    exercise2: { name: "", content: "" }, //
-    exercise3: { name: "", content: "" }, //
-    exercise4: { name: "", content: "" }, //
-    exercise5: { name: "", content: "" }, //
-    exercise6: { name: "", content: "" }, //
+    exercise1: { name: "", content: "", isChecked: false },
+    exercise2: { name: "", content: "", isChecked: false },
+    exercise3: { name: "", content: "", isChecked: false },
+    exercise4: { name: "", content: "", isChecked: false },
+    exercise5: { name: "", content: "", isChecked: false },
+    exercise6: { name: "", content: "", isChecked: false },
   });
 
-  const SelectedProgram = programComponents[programTodo];
-  //---------------------------------------------------------//
+  const handleTitle = (e) => setTitle(e.target.value);
+  const handleMaxWeight = (e) => setMaxWeight(e.target.value);
 
-  const handleTitle = (e) => {
-    setTitle(e.target.value); //
-  };
-
-  const handleMaxWeight = (e) => {
-    setMaxWeight(e.target.value); //
-  };
-
-  //--------운동 종목, 운동내용 input값----------------------------------------------------------------------//
   const handleChange = (e, exerciseKey) => {
-    //
-    const { name, value } = e.target; //
+    const { name, value } = e.target;
     setExerciseData({
-      //
-      ...exerciseData, //
-      [exerciseKey]: { ...exerciseData[exerciseKey], [name]: value }, //
-    }); //
-  }; //
-  //--------------------------------------------------------------------------------------------------------//
+      ...exerciseData,
+      [exerciseKey]: { ...exerciseData[exerciseKey], [name]: value },
+    });
+  };
 
-  //-----------저장버튼 클릭시 실행 함수---------------------------------------------------------------------//
+  const handleCheckbox = (e, exerciseKey) => {
+    const { checked } = e.target;
+    setExerciseData({
+      ...exerciseData,
+      [exerciseKey]: {
+        ...exerciseData[exerciseKey],
+        isChecked: checked,
+        name: checked
+          ? programData.programs[exerciseKey.slice(-1) - 1]?.title
+          : "",
+        content: checked
+          ? programData.programs[exerciseKey.slice(-1) - 1]?.content
+          : "",
+      },
+    });
+  };
+
   const handleSubmit = async (e) => {
-    //
-    e.preventDefault(); //
+    e.preventDefault();
     try {
-      //
       const response = await axios.post("http://localhost:3001/exercises", {
-        //
-        userid: localStorage.getItem("userid"), //
+        userid: localStorage.getItem("userid"),
         date: date,
-        title: title, //
+        title: title,
         maxWeight: maxWeight,
-        ...exerciseData, //
-      }); //
-      console.log("Server response:", response.data); //
-      alert("저장되었습니다."); //
+        ...exerciseData,
+      });
+      console.log("Server response:", response.data);
+      alert("저장되었습니다.");
     } catch (error) {
-      //
-      console.error("Error sending data to server:", error); //
-    } //
-  }; //
-  //--------------------------------------------------------------------------------------------------------//
+      console.error("Error sending data to server:", error);
+    }
+  };
 
-  //---------useEffect-------------------------------------//
-  useEffect(
-    () => {
-      //TODO LIST: server에서 programTodo의 이름으로 된 content를 db에서 뽑아오도록 구현
-      console.log(programTodo); 
-    }, 
-  ); 
-  //-------------------------------------------------------//
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/program_data",
+          { name: programTodo }
+        );
+        setProgramData(response.data);
+      } catch (error) {
+        console.error("Error fetching diary data:", error);
+      }
+    };
+    fetchData();
+  }, [programTodo]);
 
-  //-----------페이지 구성--------------------------------------------//
   return (
-    //
     <div>
-      <div style={{ float: "right", marginRight: "50%" }}>
-        <h2>{date}</h2>
-        <h1>운동 다이어리</h1>
-        <div>
+      <div className="container">
+        <div className="box">
           <p>제목</p>
-          <input onChange={handleTitle}></input>
+          <Input onChange={handleTitle}></Input>
+          <form className="diary" onSubmit={handleSubmit}>
+            <Button type="submit">저장</Button>
+            {Object.keys(exerciseData).map((exerciseKey, index) => (
+              <div style={{ width: "600px" }} key={exerciseKey}>
+                <Input
+                  style={{ marginRight: "10px" }}
+                  type="text"
+                  name="name"
+                  placeholder={
+                    (programData && programData.programs[index]?.title) ||
+                    "content"
+                  }
+                  value={exerciseData[exerciseKey].name}
+                  onChange={(e) => handleChange(e, exerciseKey)}
+                />
+                <Input
+                  type="text"
+                  name="content"
+                  placeholder={
+                    (programData && programData.programs[index]?.content) ||
+                    "set/lap/weight"
+                  }
+                  value={exerciseData[exerciseKey].content}
+                  onChange={(e) => handleChange(e, exerciseKey)}
+                />
+                {programData && programData.programs[index] && (
+                  <Checkbox
+                    checked={exerciseData[exerciseKey].isChecked}
+                    onChange={(e) => handleCheckbox(e, exerciseKey)}
+                  />
+                )}
+              </div>
+            ))}
+          </form>
         </div>
-        <form onSubmit={handleSubmit}>
-          {Object.keys(exerciseData).map((exerciseKey) => (
-            <div key={exerciseKey}>
-              <input
-                type="text"
-                name="name"
-                placeholder="운동 종목명"
-                value={exerciseData[exerciseKey].name}
-                onChange={(e) => handleChange(e, exerciseKey)}
-              />
-              <input
-                type="text"
-                name="content"
-                placeholder="운동 수행 내용"
-                value={exerciseData[exerciseKey].content}
-                onChange={(e) => handleChange(e, exerciseKey)}
-              />
-            </div>
-          ))}
-
-          <div>
-            <p>1RM</p>
-            <input type="text" onChange={handleMaxWeight}></input>
-          </div>
-          <button type="submit">저장</button>
-        </form>
       </div>
-      <div style={{ float: "left" }}>
-        {SelectedProgram && <SelectedProgram />}
+      <div className="box-right">
+        <div style={{ float: "top" }}>
+          <p>1RM</p>
+          <Input type="text" onChange={handleMaxWeight}></Input>
+        </div>
+        <div style={{ float: ""}}>
+          <h1>{date}</h1>
+        </div>
       </div>
     </div>
-  ); //
-}; //
-//-----------------------------------------------------------------//
+  );
+};
 
 export default DiaryPage;

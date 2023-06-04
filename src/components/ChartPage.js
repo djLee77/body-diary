@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -8,19 +8,28 @@ import {
   Tooltip,
 } from "recharts";
 import axios from "axios";
-import { Button } from "@mui/material";
+import { Button, FormControl, Input, InputLabel, MenuItem, Select } from "@mui/material";
 import "./ChartPage.css";
+import { useNavigate } from "react-router-dom";
 
 const ChartPage = () => {
+  const navigate = useNavigate();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [title, setTitle] = useState("");
+  const [event, setEvent] = useState("");
   const [chartData, setChartData] = useState([]);
 
+  useEffect(() => {
+    if (localStorage.getItem("isLogin") !== "true") {
+      navigate("/login");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const fetchData = async () => {
-    const response = await axios.get("http://localhost:3001/diary_data", {
+    const response = await axios.get("http://localhost:3001/chart_data", {
       params: {
-        title,
+        event,
         startDate,
         endDate,
       },
@@ -30,18 +39,33 @@ const ChartPage = () => {
 
   return (
     <div>
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Title"
-      />
-      <input
+      <FormControl sx={{ m: 1, minWidth: 80 }}>
+              <InputLabel id="demo-simple-select-autowidth-label">
+                1RM
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-autowidth-label"
+                id="demo-simple-select-autowidth"
+                value={event}
+                onChange={(e) => setEvent(e.target.value)}
+                autoWidth
+                label="Event"
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={"Benchpress"}>Benchpress</MenuItem>
+                <MenuItem value={"Deadlift"}>Deadlift</MenuItem>
+                <MenuItem value={"Squat"}>Squat</MenuItem>
+                <MenuItem value={"O.H.P"}>O.H.P</MenuItem>
+              </Select>
+            </FormControl>
+      <Input
         type="date"
         value={startDate}
         onChange={(e) => setStartDate(e.target.value)}
       />
-      <input
+      <Input
         type="date"
         value={endDate}
         onChange={(e) => setEndDate(e.target.value)}

@@ -43,18 +43,13 @@ const Navbar = () => {
 
   return (
     <nav className="navbar navbar-expand-custom navbar-mainbg">
-      {/* <div style={{float:"left", color:"white", padding:"15px", paddingBottom:"0px"}}><p>Body Diary</p></div> */}
       <div className="collapse navbar-collapse" id="navbarSupportedContent">
         <ul className="navbar-nav ml-auto">
           <div className="hori-selector">
             <div className="left"></div>
             <div className="right"></div>
           </div>
-          <li className="nav-item" onClick={handleItemClick}>
-            <NavLink className="nav-link" to="/">
-              Home
-            </NavLink>
-          </li>
+
           <li className="nav-item" onClick={handleItemClick}>
             <NavLink
               className="nav-link"
@@ -74,10 +69,16 @@ const Navbar = () => {
               Mypage
             </NavLink>
           </li>
-          <div style={{float: "right"}}>
+          <div style={{ float: "right" }}>
             {localStorage.getItem("isLogin") === "false" ? (
               <li>
-                <a style={{padding :"0px"}}><Link to = "/login">Login</Link></a>
+                <NavLink
+                  className="nav-link"
+                  activeClassName="active"
+                  to="/login"
+                >
+                  Login
+                </NavLink>
               </li>
             ) : (
               <li className="nav-item" onClick={handleLogoutClick}>

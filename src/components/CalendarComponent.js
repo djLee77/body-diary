@@ -15,6 +15,7 @@ import Explain4 from "./explains/explain4";
 import Explain5 from "./explains/explain5";
 
 const CalendarComponent = () => {
+  const navigate = useNavigate();
   useEffect(() => {
     if (localStorage.getItem("isLogin") !== "true") {
       navigate("/login");
@@ -23,7 +24,6 @@ const CalendarComponent = () => {
   }, []);
 
   const [value, setValue] = useState(new Date());
-  const navigate = useNavigate();
   const [tileContent, setTileContent] = useState([]);
   const [type, setType] = useState("");
   const [programSchedule, setProgramSchedule] = useState({});
@@ -97,7 +97,7 @@ const CalendarComponent = () => {
 
     for (let i = 1; i <= 42; i++) {
       const date = addDays(parsedStartDate, i);
-      schedule[toLocalDateString(date)] = `${type}+${i}`;
+      schedule[toLocalDateString(date)] = `${type}${i}`;
     }
 
     return schedule;

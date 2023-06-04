@@ -1,6 +1,8 @@
 /* ~~~ container styles ~~~ */
 .bg_left{
   float: left;
+  height: 100%;
+  
 }
 
 .bg_right{

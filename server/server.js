@@ -107,37 +107,55 @@ async function checkIfUserExists(userid) {                                      
 
 
 //-------Diary page 내용 DB에 저장--------------------------------------------------------------------------------------------------------------------------//
-app.post('/exercises', (req, res) => {                                                                                                                      //
-  const {                                                                                                                                                   //
-    userid, date, title, maxWeight, exercise1, exercise2, exercise3, exercise4, exercise5, exercise6                                                                          //
-  } = req.body;                                                                                                                                             //
-                                                                                                                                                            //
-  console.log(req.body);                                                                                                                                    //
-                                                                                                                                                            //
-  const insertQuery = `                                                                                                                                     
-  INSERT INTO diary (userid, url, title, max, exercise1, field1, exercise2, field2, exercise3, field3, exercise4, field4, exercise5, field5, exercise6, field6)         
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+app.post('/exercises', (req, res) => {
+  const {
+    userid, date, title, maxWeight, event, memo,
+    exercise1, exercise2, exercise3, exercise4, exercise5, exercise6,
+  } = req.body;
+
+  console.log(req.body);
+
+  const insertExerciseQuery = `
+  INSERT INTO diary (userid, url, title, max, event,
+    exercise1, field1, exercise2, field2,
+    exercise3, field3, exercise4, field4,
+    exercise5, field5, exercise6, field6)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
-                                                                                                                                                            //
-  const values = [                                                                                                                                          //
-    userid, date, title, maxWeight,                                                                                                                                         //
-    exercise1.name, exercise1.content,                                                                                                                      //
-    exercise2.name, exercise2.content,                                                                                                                      //
-    exercise3.name, exercise3.content,                                                                                                                      //
-    exercise4.name, exercise4.content,                                                                                                                      //
-    exercise5.name, exercise5.content,                                                                                                                      //
-    exercise6.name, exercise6.content,                                                                                                                      //
-  ];                                                                                                                                                        //
-                                                                                                    //--------------------------------------------------------
-  db.query(insertQuery, values, (error) => {                                                        //
-    if (error) {                                                                                    //
-      res.status(500).json({ message: 'Error saving exercise data to the database.', error });      //
-      return;                                                                                       //
-    }                                                                                               //
-    res.status(201).json({ message: 'Exercise data saved to the database.' });                      //
-  });                                                                                               //
-});                                                                                                 //
-                                                                                                    //
+
+  const exerciseValues = [
+    userid, date, title, maxWeight, event,
+    exercise1.name, exercise1.content,
+    exercise2.name, exercise2.content,
+    exercise3.name, exercise3.content,
+    exercise4.name, exercise4.content,
+    exercise5.name, exercise5.content,
+    exercise6.name, exercise6.content,
+  ];
+
+  db.query(insertExerciseQuery, exerciseValues, (error) => {
+    if (error) {
+      res.status(500).json({ message: 'Error saving exercise data to the database.', error });
+      return;
+    }
+    const insertMemoQuery = `
+    INSERT INTO memo (userid, date, content)
+    VALUES (?, ?, ?);
+    `;
+
+    const memoValues = [userid, date, memo];
+
+    db.query(insertMemoQuery, memoValues, (error) => {
+      if (error) {
+        res.status(500).json({ message: 'Error saving memo data to the database.', error });
+        return;
+      }
+
+      res.status(201).json({ message: 'Exercise and memo data saved to the database.' });
+    });
+  });
+});
+                                                                                              //
 //--------------------------------------------------------------------------------------------------//
 
 
@@ -323,11 +341,11 @@ app.post("/get_program", async (req, res) => {                                  
 
 const queryPromise = util.promisify(db.query).bind(db);
 
-app.get('/diary_data', async (req, res) => {
-  const { title, startDate, endDate } = req.query;
+app.get('/chart_data', async (req, res) => {
+  const { event, startDate, endDate } = req.query;
 
-  const query = `SELECT url, max FROM diary WHERE title = ? AND url BETWEEN ? AND ? ORDER BY url`;
-  const values = [title, startDate, endDate];
+  const query = `SELECT url, max FROM diary WHERE event = ? AND url BETWEEN ? AND ? ORDER BY url`;
+  const values = [event, startDate, endDate];
 
   try {
     const result = await queryPromise(query, values);
@@ -337,6 +355,55 @@ app.get('/diary_data', async (req, res) => {
     res.status(500).send({ success: false, message: '서버 오류입니다.' });
   }
 });
+
+
+//----------------------------Program todo에 데이터 전송--------------------------------------------------//
+app.post('/program_data', async (req, res) => {                                                          //
+  const { name } = req.body;                                                                             //
+                                                                                                         //
+  try {                                                                                                  //
+    const programData = await getProgramData(name);                                                      //
+    res.send(programData);                                                                               //
+  } catch (error) {                                                                                      //
+    console.error(error);                                                                                //
+    res.status(500).send({ success: false, message: '서버 오류입니다.' });                                //
+  }                                                                                                      //
+});                                                                                                      //
+                                                                                                         //
+async function getProgramData(name) {                                                                    //
+  const query = `SELECT * FROM schedule WHERE name = '${name}'`;                                         //
+                                                                                                         //
+  const queryPromise = util.promisify(db.query).bind(db);                                                //
+                                                                                                         //
+  try {                                                                                                  //
+    const result = await queryPromise(query);                                                            //
+                                                                                                         //
+    if (result.length === 0) {                                                                           //
+      return null                                                                                        //
+    } else {                                                                                             //
+      const data = result[0];                                                                            //
+                                                                                                         //
+      const programs = [                                                                                 //
+        { title: data.title1, content: data.content1 },                                                                      //
+        { title: data.title2, content: data.content2 },                                                                      //
+        { title: data.title3, content: data.content3 },                                                                      //
+        { title: data.title4, content: data.content4 },                                                                      //
+        { title: data.title5, content: data.content5 },                                                                      //
+        { title: data.title6, content: data.content6 },                                                                      //
+      ];                                                                                                 //
+                                                                                                         //
+      return {                                                                                           //
+        name: data.name,                                                                                //
+        programs: programs,                                                                              //
+      };                                                                                                 //
+    }                                                                                                    //
+  } catch (error) {                                                                                      //
+    console.error(error);                                                                                //
+    return null;                                                                                         //
+  }                                                                                                      //
+}                                                                                                        //
+//-------------------------------------------------------------------------------------------------------//
+
 
 
 const port = 3001;

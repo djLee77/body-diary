@@ -6,7 +6,6 @@ import Login from "./components/Login"
 import SignUp from "./components/SignUp"
 import { BrowserRouter, Routes, Route} from 'react-router-dom'
 import Navbar from './components/Navbar';
-import Layout from './components/Layout';
 import MyPage from './components/MyPage'
 import Chart from './components/ChartPage'
 
@@ -15,7 +14,7 @@ function App() {
     <BrowserRouter>
       <Navbar/>
       <Routes>
-        <Route path={"/"} element={<Layout/>}></Route>
+        <Route path={"/"} element={<Calendar/>}></Route>
         <Route path={"/calendar"} element={<Calendar/>}></Route>
         <Route path={"/login"} element={<Login/>}></Route>
         <Route path={"/signup"} element={<SignUp/>}></Route>

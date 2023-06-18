@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Navbar.css";
 import { NavLink } from "react-router-dom";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -57,11 +57,6 @@ const Navbar = () => {
               to="/calendar"
             >
               Calendar
-            </NavLink>
-          </li>
-          <li className="nav-item" onClick={handleItemClick}>
-            <NavLink className="nav-link" activeClassName="active" to="/chart">
-              Chart
             </NavLink>
           </li>
           <li className="nav-item" onClick={handleItemClick}>

@@ -31,10 +31,16 @@ const CalendarComponent = () => {
 
   useEffect(() => {
     const tiles = [];
-    const startOfMonth = new Date(value.getFullYear(), value.getMonth(), 1);
-    for (let i = 0; i < 31; i++) {
-      tiles.push({ date: addDays(startOfMonth, i), view: "month" });
+    const startOfYear = new Date(value.getFullYear(), 0, 1);
+    const endOfYear = new Date(value.getFullYear(), 11, 31);
+
+    let day = startOfYear;
+
+    while (day <= endOfYear) {
+        tiles.push({ date: new Date(day), view: "month" });
+        day = addDays(day, 1);
     }
+
     Promise.all(
       tiles.map((tile) =>
         renderTileContent(tile).then((content) => ({
@@ -44,7 +50,7 @@ const CalendarComponent = () => {
       )
     ).then(setTileContent);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+}, [value, programSchedule]);
 
   //db에서 프로그램 가져오는 로직
   useEffect(() => {
@@ -88,7 +94,7 @@ const CalendarComponent = () => {
   };
 
   const getType = (e) => {
-    console.log(type);
+    alert("프로그램 일정이 내일부터 시작됩니다.");
     saveProgramSchedule(type);
   };
   const createProgramSchedule = (type) => {
@@ -105,7 +111,7 @@ const CalendarComponent = () => {
 
   const handleDelete = (e) => {
     try {
-      console.log(type);
+      alert("프로그램 일정이 초기화 되었습니다.");
       axios.post(
         "http://localhost:3001/delete_program",
         {

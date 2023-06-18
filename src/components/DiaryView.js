@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './DiaryView.css';
 import { useParams } from 'react-router-dom';
+import { Card, CardContent, Typography } from '@mui/material';
 
 const DiaryView = () => {
   const [diaryData, setDiaryData] = useState(null);
   const { date } = useParams();
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -21,19 +23,26 @@ const DiaryView = () => {
     };
 
     fetchData();
-    console.log(date);
   }, [date]);
 
   return (
     <div className="diary-view-container">
       {diaryData ? (
         <>
-          <h1>{diaryData.title}</h1>
+          <Typography variant="h4" component="h1">
+            {diaryData.title}
+          </Typography>
           {diaryData.exercises.map((exercise, index) => (
-            <div key={index} className="exercise">
-              <h2>{exercise.name}</h2>
-              <p>{exercise.content}</p>
-            </div>
+            <Card key={index} className="exercise">
+              <CardContent>
+                <Typography variant="h5" component="h2">
+                  {exercise.name}
+                </Typography>
+                <Typography variant="body1">
+                  {exercise.content}
+                </Typography>
+              </CardContent>
+            </Card>
           ))}
         </>
       ) : (

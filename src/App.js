@@ -7,7 +7,6 @@ import SignUp from "./components/SignUp"
 import { BrowserRouter, Routes, Route} from 'react-router-dom'
 import Navbar from './components/Navbar';
 import MyPage from './components/MyPage'
-import Chart from './components/ChartPage'
 
 function App() {
   return (    
@@ -21,7 +20,6 @@ function App() {
         <Route path="/diary/:date" element={<Diary/>}></Route>
         <Route path="/diary_view/:date" element={<DiaryView/>}></Route>
         <Route path="/mypage" element={<MyPage/>}></Route>
-        <Route path="/chart" element={<Chart/>}></Route>
       </Routes>
     </BrowserRouter>
   );

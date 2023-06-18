@@ -405,6 +405,41 @@ async function getProgramData(name) {                                           
 //-------------------------------------------------------------------------------------------------------//
 
 
+//---------------------------------------------------------------------------------------------------------//
+                                                                                                           //
+app.post("/memos", async (req, res) => {                                                                   //
+  const {userid} = req.body;                                                                               //
+  try {                                                                                                    //
+    const memos = await getMemos(userid);                                                                  //
+    res.send(memos);                                                                                       //
+  } catch (error) {                                                                                        //
+    console.error(error);                                                                                  //
+    res.status(500).send({ success: false, message: '서버 오류입니다.' });                                  //
+  }                                                                                                        //
+                                                                                                           //
+  async function getMemos(userid) {                                                                        //
+    const query = `SELECT * FROM memo WHERE userid = '${userid}'`;                                         //
+                                                                                                           //
+    const queryPromise = util.promisify(db.query).bind(db);                                                //
+                                                                                                           //
+    try {                                                                                                  //
+      const result = await queryPromise(query);                                                            //
+                                                                                                           //
+      if (result.length === 0) {                                                                           //
+        return null                                                                                        //
+      } else {                                                                                             //
+        return result.map(row => ({
+          content: row.content
+        }));                                                                                                //
+      }                                                                                                    //
+    } catch (error) {                                                                                      //
+      console.error(error);                                                                                //
+      return null;                                                                                         //
+    }                                                                                                      //
+  }                                                                                                        //
+});                                                                                                        //
+//---------------------------------------------------------------------------------------------------------//
+
 
 const port = 3001;
 app.listen(port, () =>

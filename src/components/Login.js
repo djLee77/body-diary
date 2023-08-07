@@ -54,6 +54,12 @@ function Login() {
       });
   };
 
+  const handleOnKeyDown = e => {
+    if (e.key === 'Enter') {
+      onClickLogin(); // Enter 입력이 되면 클릭 이벤트 실행
+    }
+  };
+
   // 페이지 렌더링 후 가장 처음 호출되는 함수
   useEffect(
     () => {
@@ -80,6 +86,7 @@ function Login() {
               placeholder="password"
               value={inputPw}
               onChange={handleInputPw}
+              onKeyDown={handleOnKeyDown}
             />
             <button type="button" onClick={onClickLogin}>
               login

@@ -70,6 +70,13 @@ function Login() {
     // 페이지 호출 후 처음 한번만 호출될 수 있도록 [] 추가
   );
 
+  const changeColor = (e) => {
+    e.target.style.color = "blue";
+  }
+
+  const removeColor = (e) => {
+    e.target.style.color = "#24292f";
+  }
   return (
     <div className="login_body">
       <div class="login-page">
@@ -91,7 +98,7 @@ function Login() {
             <button type="button" onClick={onClickLogin}>
               login
             </button>
-            <p class="message">
+            <p class="message" onMouseOver={changeColor} onMouseOut={removeColor}>
               Not registered? <Link to={'/signup'}>Create an account</Link>
             </p>
           </form>

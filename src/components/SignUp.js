@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {Link, useNavigate } from "react-router-dom";
-import "./Login.css"
+import { Link, useNavigate } from "react-router-dom";
+import "./Login.css";
 
 function SignUp() {
   const [inputId, setInputId] = useState("");
@@ -33,7 +33,7 @@ function SignUp() {
       userid: inputId,
       password: inputPw,
       name: inputName,
-    };  
+    };
     axios
       .post("http://localhost:3001/register", data)
       .then((response) => {
@@ -63,42 +63,15 @@ function SignUp() {
     []
   );
 
+  const changeColor = (e) => {
+    e.target.style.color = "blue";
+  }
+
+  const removeColor = (e) => {
+    e.target.style.color = "#24292f";
+  }
   return (
     <div>
-      {/* <h2>SignUp</h2>
-      <div>
-        <label htmlFor="input_id">ID : </label>
-        <input
-          type="text"
-          name="input_id"
-          value={inputId}
-          onChange={handleInputId}
-        />
-      </div>
-      <div>
-        <label htmlFor="input_pw">PW : </label>
-        <input
-          type="password"
-          name="input_pw"
-          value={inputPw}
-          onChange={handleInputPw}
-        />
-      </div>
-      <div>
-        <label htmlFor="input_name">NAME : </label>
-        <input
-          type="name"
-          name="input_name"
-          value={inputName}
-          onChange={handleInputName}
-        />
-      </div>
-      <div>
-        <button type="button" onClick={onClickSignUp}>
-          SignUp
-        </button>
-      </div> */}
-
       <div class="login-page">
         <div class="form">
           <form class="register-form">
@@ -126,8 +99,8 @@ function SignUp() {
             <button type="button" onClick={onClickSignUp}>
               create
             </button>
-            <p class="message">
-              Already registered? <Link to = {'/login'}>Sign In</Link>
+            <p class="message" onMouseOver={changeColor} onMouseOut={removeColor}>
+              Already registered? <Link to={"/login"}>Sign In</Link>
             </p>
           </form>
         </div>

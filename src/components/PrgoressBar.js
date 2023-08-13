@@ -6,8 +6,6 @@ const ProgressBar = () => {
   return (
       
         <Progress.Bar
-          height={8}
-          color={"rgba(51, 65, 159, 0.8)"}
         />
   );
 };

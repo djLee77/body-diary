@@ -22,10 +22,6 @@ function SignUp() {
     setInputName(e.target.value);
   };
 
-  const onClickSignIn = () =>{
-    navigate("/login");
-  }
-
   // 회원가입 버튼 클릭 이벤트
   const onClickSignUp = () => {
     console.log("click SignUp");

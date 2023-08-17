@@ -440,6 +440,10 @@ app.post("/memos", async (req, res) => {                                        
 });                                                                                                        //
 //---------------------------------------------------------------------------------------------------------//
 
+app.post("/diaryCount", async(req,res)=>{
+  const {userid} = req.body;
+  
+})
 
 const port = 3001;
 app.listen(port, () =>

@@ -441,8 +441,24 @@ app.post("/memos", async (req, res) => {                                        
 //---------------------------------------------------------------------------------------------------------//
 
 app.post("/diaryCount", async(req,res)=>{
-  const {userid} = req.body;
-  
+  async function authenticate(userid, password) {                                                           //
+    const query = `SELECT * FROM usertable WHERE userid = '${userid}' AND password = '${password}'`;        //
+                                                                                                            //
+    // db.query를 Promise로 변경                                                                            //
+    const queryPromise = util.promisify(db.query).bind(db);                                                 //
+                                                                                                            //
+    try {                                                                                                   //
+      const result = await queryPromise(query);                                                             //
+      // 검색 결과가 없거나 에러가 발생한 경우                                                                //
+      if (result.length === 0) {                                                                            //
+        return { success: false };                                                                          //
+      }                                                                                                     //  
+      // 검색 결과가 있으면 인증 성공                                                                        //
+      return { success: true };                                                                             //
+    } catch (error) {                                                                                       //
+      return {success: false};                                                                              //
+    }                                                                                                       //
+  }               
 })
 
 const port = 3001;

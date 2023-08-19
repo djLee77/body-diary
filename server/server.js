@@ -440,27 +440,31 @@ app.post("/memos", async (req, res) => {                                        
 });                                                                                                        //
 //---------------------------------------------------------------------------------------------------------//
 
-app.post("/diaryCount", async(req,res)=>{
-  async function authenticate(userid, password) {                                                           //
-    const query = `SELECT * FROM usertable WHERE userid = '${userid}' AND password = '${password}'`;        //
-                                                                                                            //
-    // db.query를 Promise로 변경                                                                            //
-    const queryPromise = util.promisify(db.query).bind(db);                                                 //
-                                                                                                            //
-    try {                                                                                                   //
-      const result = await queryPromise(query);                                                             //
-      // 검색 결과가 없거나 에러가 발생한 경우                                                                //
-      if (result.length === 0) {                                                                            //
-        return { success: false };                                                                          //
-      }                                                                                                     //  
-      // 검색 결과가 있으면 인증 성공                                                                        //
-      return { success: true };                                                                             //
-    } catch (error) {                                                                                       //
-      return {success: false};                                                                              //
-    }                                                                                                       //
-  }               
-})
+app.get('/countDiaries', async (req, res) => {
+  const startDate = req.query.startDate;
+  const endDate = req.query.endDate;
 
+  if (!startDate || !endDate) {
+    return res.status(400).json({ message: 'startDate and endDate are required.' });
+  }
+
+  const sqlQuery = `
+    SELECT COUNT(*) AS count
+    FROM diary
+    WHERE url BETWEEN ? AND ?;
+  `;
+
+  try {
+    const queryPromise = util.promisify(db.query).bind(db);
+    const result = await queryPromise(sqlQuery, [startDate, endDate]);
+    const count = result[0].count;
+
+    res.json({ count });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error.' });
+  }
+});
 const port = 3001;
 app.listen(port, () =>
   console.log(`Node.js Server is running on port ${port}...`)

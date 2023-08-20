@@ -10,7 +10,6 @@ function ProgressBar() {
 
     return () => clearInterval(timer);
 
-    // Todo : server에서 작성된 다이어리 개수를 가져옴
   }, []);
 
   return (

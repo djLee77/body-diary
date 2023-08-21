@@ -9,9 +9,32 @@ function ProgressBar() {
     }, 50);
 
     return () => clearInterval(timer);
-
+    
   }, []);
 
+  useEffect(() => {
+    axios
+      .post("http://localhost:3001/countDiaries", data)
+      .then((response) => {
+        //console.log(response.data); Todo list : data에 시작 날짜, 끝나는 날짜 담기
+        localStorage.setItem("isLogin", response.data.success);
+        console.log(
+          "is Login in localstorage : " + localStorage.getItem("isLogin")
+        );
+
+        if (localStorage.getItem("isLogin") === "true") {
+          console.log("Login success");
+          localStorage.setItem("userid", inputId);
+          navigate("/calendar");
+        } else {
+          alert("ID 혹은 Password를 확인해주세요.");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        // 에러가 발생했을 때 처리할 코드
+      });
+  })
   return (
     <div style={{ width: '100%', margin: '10px' }}>
       <div

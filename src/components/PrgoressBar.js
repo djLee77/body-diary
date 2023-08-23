@@ -16,8 +16,6 @@ function ProgressBar() {
     axios
       .post("http://localhost:3001/countDiaries", data)
       .then((response) => {
-        //console.log(response.data); Todo list : data에 시작 날짜, 끝나는 날짜 담기
-        //Todo list : 프로그램 루틴 진행중인 날짜인지 체크하는 함수 작성
         localStorage.setItem("isLogin", response.data.success);
         console.log(
           "is Login in localstorage : " + localStorage.getItem("isLogin")

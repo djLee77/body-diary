@@ -13,7 +13,6 @@ import Explain2 from "./explains/explain2";
 import Explain3 from "./explains/explain3";
 import Explain4 from "./explains/explain4";
 import Explain5 from "./explains/explain5";
-import ProgressBar from "./PrgoressBar";
 
 const CalendarComponent = () => {
   const navigate = useNavigate();
@@ -222,9 +221,6 @@ const CalendarComponent = () => {
         </div>
       </div>
       <div className="bg_right">
-        <div>
-          <ProgressBar/>
-        </div>
         <div className="Calendar_box">
           <Calendar
             locale="en-GB"
